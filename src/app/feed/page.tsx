@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, User, Plus, Loader2, Search, Tag, Filter } from 'lucide-react';
+import { MapPin, Calendar, User, Plus, Loader2, Search, Tag, Filter, ArrowBigUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Navbar from '@/components/Navbar';
 
 
 interface Story {
@@ -18,6 +19,7 @@ interface Story {
   location: string;
   historicalPeriod?: string;
   tags?: string[];
+  upvotes?: number;
   createdAt: string;
 }
 
@@ -66,47 +68,7 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">StorySnap</h1>
-          <div className="flex items-center gap-4">
-            {user && (
-              <>
-                <button
-                  onClick={() => router.push('/create-story')}
-                  className="bg-black text-white px-6 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  Share Story
-                </button>
-                <button
-                  onClick={() => router.push('/profile')}
-                  className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
-                  title="Profile"
-                >
-                  <User className="w-5 h-5" />
-                </button>
-                {isAdmin && (
-                  <button
-                    onClick={() => router.push('/admin')}
-                    className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
-                  >
-                    Admin
-                  </button>
-                )}
-              </>
-            )}
-            {!user && (
-              <button
-                onClick={() => router.push('/login')}
-                className="bg-black text-white px-6 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
-              >
-                Login
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -231,9 +193,15 @@ export default function FeedPage() {
                       </ReactMarkdown>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <User className="w-4 h-4" />
-                      <span>{story.authorName}</span>
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <User className="w-4 h-4" />
+                        <span>{story.authorName}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                        <ArrowBigUp className="w-5 h-5" />
+                        <span>{story.upvotes || 0}</span>
+                      </div>
                     </div>
                   </div>
               </motion.div>

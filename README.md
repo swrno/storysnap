@@ -58,7 +58,7 @@ A beautiful platform for sharing and discovering historical place stories with i
    NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
    # MongoDB
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/storysnap?retryWrites=true&w=majority
+   MONGODB_URI=
 
    # Cloudinary
    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name

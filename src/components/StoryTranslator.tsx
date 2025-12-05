@@ -72,7 +72,7 @@ export default function StoryTranslator({ onTranslate, onTranslateStart, origina
   };
 
   return (
-    <div className="relative z-50">
+    <div className="relative z-10">
       <div className="flex items-center gap-2">
         <button
           onClick={() => setIsOpen(!isOpen)}

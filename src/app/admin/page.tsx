@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Loader2, Eye, Clock, Users, Plus, LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { Loader2, Check, X, Eye, Plus, Users, LayoutGrid, Table as TableIcon, CheckCircle, XCircle } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -132,38 +133,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 
-            className="text-3xl font-bold text-gray-900 cursor-pointer hover:text-gray-600 transition-colors"
-            onClick={() => router.push('/feed')}
-          >
-            StorySnap
-          </h1>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.push('/create-story')}
-              className="bg-black text-white px-6 py-2 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Share Story
-            </button>
-            <button
-              onClick={() => router.push('/profile')}
-              className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
-              title="Profile"
-            >
-              <Users className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => router.push('/feed')}
-              className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors font-semibold"
-            >
-              Feed
-            </button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <div className="max-w-7xl mx-auto py-12 px-4">
         <motion.div
