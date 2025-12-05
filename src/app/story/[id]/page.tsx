@@ -11,8 +11,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import StoryTranslator from '@/components/StoryTranslator';
 import ClientOnly from '@/components/ClientOnly';
 import Navbar from '@/components/Navbar';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
 
 interface Story {
   _id: string;
@@ -201,20 +199,94 @@ export default function StoryPage() {
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const element = document.getElementById('story-content');
-    if (!element) return;
+    if (!element) {
+      console.error('Story content element not found');
+      return;
+    }
 
-    const opt = {
-      margin: 1,
-      filename: `${story?.title || 'story'}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    
-    // @ts-ignore
-    html2pdf().set(opt).from(element).save();
+    try {
+      // @ts-ignore
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      // Clone the element to modify styles without affecting the UI
+      const clone = element.cloneNode(true) as HTMLElement;
+      
+      // Create a container for the clone to ensure it renders correctly for style computation
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = `${element.offsetWidth}px`; // Match original width
+      container.appendChild(clone);
+      document.body.appendChild(container);
+
+      // Helper to convert colors to RGB using Canvas (handles lab, oklch, etc.)
+      const canvas = document.createElement('canvas');
+      canvas.width = 1;
+      canvas.height = 1;
+      const ctx = canvas.getContext('2d');
+
+      const toStandardColor = (color: string) => {
+        if (!ctx || !color) return color;
+        ctx.fillStyle = color;
+        return ctx.fillStyle; // Browser converts to hex/rgb
+      };
+
+      const sanitizeColors = (el: HTMLElement) => {
+        const style = window.getComputedStyle(el);
+        
+        // Properties to sanitize
+        const colorProps = [
+          'color', 
+          'backgroundColor', 
+          'borderTopColor', 
+          'borderRightColor', 
+          'borderBottomColor', 
+          'borderLeftColor',
+          'textDecorationColor'
+        ];
+        
+        colorProps.forEach(prop => {
+          // @ts-ignore
+          const val = style[prop];
+          if (val && (val.includes('lab(') || val.includes('oklch(') || val.startsWith('var('))) {
+             // @ts-ignore
+             el.style[prop] = toStandardColor(val);
+          }
+        });
+
+        // Remove shadows as they often contain complex colors and are not critical for PDF
+        el.style.boxShadow = 'none';
+        el.style.textShadow = 'none';
+        
+        Array.from(el.children).forEach(child => sanitizeColors(child as HTMLElement));
+      };
+
+      // Apply sanitization to the clone (which is now in the DOM)
+      sanitizeColors(clone);
+
+      const opt = {
+        margin: [0.5, 0.5] as [number, number],
+        filename: `${story?.title || 'story'}.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          logging: false
+        },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+      };
+      
+      await html2pdf().set(opt).from(clone).save();
+      
+      // Cleanup
+      document.body.removeChild(container);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert(`Failed to generate PDF: ${error instanceof Error ? error.message : String(error)}`);
+    }
   };
 
   if (loading) {
@@ -461,7 +533,7 @@ export default function StoryPage() {
                     />
                   </div>
 
-                  <div className="prose prose-lg md:prose-2xl max-w-none prose-headings:font-playfair prose-h1:text-4xl md:prose-h1:text-6xl prose-h1:mb-8 md:prose-h1:mb-12 prose-h2:text-3xl md:prose-h2:text-5xl prose-h2:mb-6 md:prose-h2:mb-10 prose-h3:text-2xl md:prose-h3:text-4xl prose-h3:mb-4 md:prose-h3:mb-8 prose-p:text-gray-800 prose-p:leading-loose prose-p:mb-6 prose-p:text-base md:prose-p:text-lg prose-li:text-base md:prose-li:text-lg prose-a:text-black prose-strong:text-gray-900 prose-ul:list-disc prose-ol:list-decimal prose-li:mb-3">
+                  <div className="prose prose-lg md:prose-2xl max-w-none prose-headings:font-playfair prose-h1:text-4xl md:prose-h1:text-6xl prose-h1:mb-8 md:prose-h1:mb-12 prose-h2:text-3xl md:prose-h2:text-5xl prose-h2:mb-6 md:prose-h2:mb-10 prose-h3:text-2xl md:prose-h3:text-4xl prose-h3:mb-4 md:prose-h3:mb-8 prose-p:text-gray-800 prose-p:leading-loose prose-p:mb-6 prose-p:text-base md:prose-p:text-lg prose-li:text-base md:prose-li:text-lg prose-td:text-base md:prose-td:text-lg prose-th:text-base md:prose-th:text-lg prose-a:text-black prose-strong:text-gray-900 prose-ul:list-disc prose-ol:list-decimal prose-li:mb-3">
                     {isTranslating ? (
                       <div className="flex flex-col items-center justify-center py-12 space-y-4">
                         <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
