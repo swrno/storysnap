@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "home": "Home",
+    "feed": "Feed",
+    "createStory": "Share Story",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "hero": {
+    "title": "Discover Historical Stories",
+    "subtitle": "Explore fascinating tales from historical places around the world"
+  },
+  "auth": {
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Login to share your historical stories",
+    "signupTitle": "Create Account",
+    "signupSubtitle": "Join us to share historical stories",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "loginButton": "Login",
+    "signupButton": "Create Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "story": {
+    "title": "Story Title",
+    "location": "Location",
+    "historicalPeriod": "Historical Period",
+    "content": "Story Content",
+    "images": "Images",
+    "submit": "Submit Story",
+    "cancel": "Cancel",
+    "listenAudio": "Listen to story",
+    "stopAudio": "Stop audio"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "pending": "Pending Review",
+    "approve": "Approve",
+    "reject": "Reject",
+    "view": "View"
+  }
+}

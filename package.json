@@ -9,9 +9,21 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "@uiw/react-md-editor": "^4.0.11",
+    "cloudinary": "^2.8.0",
+    "firebase": "^12.6.0",
+    "framer-motion": "^12.23.25",
+    "lucide-react": "^0.555.0",
+    "mongoose": "^9.0.0",
     "next": "16.0.7",
+    "next-intl": "^4.5.8",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-markdown": "^10.1.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
