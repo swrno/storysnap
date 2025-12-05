@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -12,21 +12,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     
     if (!apiKey) {
-      console.error("GOOGLE_API_KEY is missing in environment variables");
+      console.error("GROQ_API_KEY is missing in environment variables");
       return NextResponse.json(
-        { error: "GOOGLE_API_KEY is not configured" },
+        { error: "GROQ_API_KEY is not configured" },
         { status: 500 }
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
-      generationConfig: { responseMimeType: "application/json" }
-    });
+    const groq = new Groq({ apiKey });
 
     const prompt = `You are a professional translator. Translate the following content to ${targetLanguage}.
     
@@ -40,9 +36,28 @@ export async function POST(request: Request) {
     4. Return ONLY a JSON object with keys "translatedTitle", "translatedContent", and "translatedContentsLabel".
     `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const jsonResponse = JSON.parse(response.text());
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that translates text and returns valid JSON."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      response_format: { type: "json_object" }
+    });
+
+    const responseContent = completion.choices[0]?.message?.content;
+
+    if (!responseContent) {
+      throw new Error("No content received from Groq API");
+    }
+
+    const jsonResponse = JSON.parse(responseContent);
 
     return NextResponse.json({ 
       translatedText: jsonResponse.translatedContent,

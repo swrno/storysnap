@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, User, ArrowLeft, Loader2, Volume2, VolumeX, Plus, Clock, BookOpen, PenTool, Tag, ThumbsUp, ArrowBigUp } from 'lucide-react';
+import { MapPin, Calendar, User, ArrowLeft, Loader2, Volume2, VolumeX, Plus, Clock, BookOpen, PenTool, Tag, ThumbsUp, ArrowBigUp, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import StoryTranslator from '@/components/StoryTranslator';
 import ClientOnly from '@/components/ClientOnly';
 import Navbar from '@/components/Navbar';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 interface Story {
   _id: string;
@@ -199,6 +201,22 @@ export default function StoryPage() {
     }
   };
 
+  const handleDownloadPDF = () => {
+    const element = document.getElementById('story-content');
+    if (!element) return;
+
+    const opt = {
+      margin: 1,
+      filename: `${story?.title || 'story'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // @ts-ignore
+    html2pdf().set(opt).from(element).save();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -259,6 +277,7 @@ export default function StoryPage() {
           {/* Main Content */}
           <div className="lg:col-span-9">
             <motion.div
+              id="story-content"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-8"
@@ -303,15 +322,24 @@ export default function StoryPage() {
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <div className="flex items-start md:items-center gap-4 w-full md:w-auto">
                           <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">{translatedTitle || story.title}</h1>
-                          {isAdmin && (
+                          <div className="flex items-center gap-2 mt-1 md:mt-0 flex-shrink-0">
+                            {isAdmin && (
+                              <button
+                                onClick={() => router.push(`/story/${params?.id}/edit`)}
+                                className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all"
+                                title="Edit Story"
+                              >
+                                <PenTool className="w-5 h-5" />
+                              </button>
+                            )}
                             <button
-                              onClick={() => router.push(`/story/${params?.id}/edit`)}
-                              className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all flex-shrink-0 mt-1 md:mt-0"
-                              title="Edit Story"
+                              onClick={handleDownloadPDF}
+                              className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all"
+                              title="Download PDF"
                             >
-                              <PenTool className="w-5 h-5" />
+                              <Download className="w-5 h-5" />
                             </button>
-                          )}
+                          </div>
                         </div>
 
                       </div>
